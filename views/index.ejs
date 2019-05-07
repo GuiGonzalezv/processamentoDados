@@ -54,34 +54,104 @@
 									</div>
 							</div>
 
+							
+
 							<div class="row">
-									<div class="col-md-4">
+								
+								<div class="col-md-6">
+									
+									<div id="main" class="chart-container" style="width: 550px; height: 300px"></div>
+									
+
+								</div>
+								
+								<div id="dados" class="col-md-6 hidden">
+									<div class="col-md-3">
 										<label for="data_ini"> Data Inicial </label>
 										<select class="form-control" id="data_ini"></select>
-										
 									</div>
-
-									<div class="col-md-4">
-										<label for="data_fim"> Data Final</label>
-										<select class="form-control" id="data_fim"></select>										
-										
-									</div>
-									<div class="col-md-4"> 
-										<button class="btn btn-success btn-flat" id='media'>Média</button>
-									</div>
-							</div>
-
-							<div class="row">
-								<div class="col-md-3">
 									
+									<div class="col-md-3">
+										<label for="data_fim"> Data Final</label>
+										<select class="form-control" id="data_fim"></select>
+									</div>
+									
+									<button class="btn btn-success btn-flat" style="margin-top: 24px" id='media' data-toggle="modal" data-target="#exampleModal">Média</button>	
 								</div>
-								<div class="col-md-5">
-									<div id="main" class="chart-container" style="width: 550px; height: 300px"></div>
-									<!-- <canvas id="myChart" width="700" height="400"></canvas> -->
+
+							</div>
+
+						</div>
+						
+						<div class="row">
+								
+								<div class="col-md-6">
+									<div id="chartVelocidade" class="chart-container" style="width: 550px; height: 300px"></div>
+									
 
 								</div>
-								<div class="col-md-4"></div>								
+								
+								<div id="dadosVelocidade" class="col-md-6 hidden">
+									<div class="col-md-3">
+										<label for="data_ini_velocidade"> Data Inicial </label>
+										<select class="form-control" id="data_ini_velocidade"></select>
+									</div>
+									
+									<div class="col-md-3">
+										<label for="data_fim_velocidade"> Data Final</label>
+										<select class="form-control" id="data_fim_velocidade"></select>
+									</div>
+									
+									<button class="btn btn-success btn-flat" style="margin-top: 24px" id='mediaVelocidade' data-toggle="modal" data-target="#exampleModal">Média</button>	
+								</div>
+
 							</div>
+
+						</div>
+
+						<div class="row">
+								
+								<div class="col-md-6">
+									<div id="chartTemperatura" class="chart-container" style="width: 550px; height: 300px"></div>
+
+								</div>
+								
+								<div id="dadosTemperatura" class="col-md-6 hidden">
+									<div class="col-md-3">
+										<label for="data_ini_temperatura"> Data Inicial </label>
+										<select class="form-control" id="data_ini_temperatura"></select>
+									</div>
+									
+									<div class="col-md-3">
+										<label for="data_fim_temperatura"> Data Final</label>
+										<select class="form-control" id="data_fim_temperatura"></select>
+									</div>
+									
+									<button class="btn btn-success btn-flat" style="margin-top: 24px" id='mediaTemperatura' data-toggle="modal" data-target="#exampleModal">Média</button>	
+								</div>
+
+							</div>
+
+						</div>
+
+						<!-- Modal -->
+						<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+						  <div class="modal-dialog" role="document">
+						    <div class="modal-content">
+						      <div class="modal-header">
+						        <h5 class="modal-title" id="exampleModalLabel"></h5>
+						        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						          <span aria-hidden="true">&times;</span>
+						        </button>
+						      </div>
+						      <div class="modal-body">
+						        <span id="mediaVal"> </span>
+						      </div>
+						      <div class="modal-footer">
+						        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+						      </div>
+						    </div>
+						  </div>
 						</div>
 						
 						<!-- </div class="container">
@@ -140,7 +210,47 @@
 			})
 
 			media = soma / cont;
-			alert(media)
+			$("#mediaVal").text("Média:" + media.toFixed(2))
+
+			
+		})
+
+		$("#mediaVelocidade").on('click', function(){
+			data_ini = $("#data_ini_velocidade").val()
+			data_fim = $("#data_fim_velocidade").val()
+
+			cont = 0
+			soma = 0
+
+			timeVelocidade.map((e) => {
+				if(e >= data_ini && e <= data_fim){
+					soma += dataVelocidade[timeVelocidade.indexOf(e)]
+					cont++;
+				}
+			})
+
+			media = soma / cont;
+			$("#mediaVal").text("Média:" + media.toFixed(2))
+
+			
+		})
+
+		$("#mediaTemperatura").on('click', function(){
+			data_ini = $("#data_ini_temperatura").val()
+			data_fim = $("#data_fim_temperatura").val()
+
+			cont = 0
+			soma = 0
+
+			timeTemperatura.map((e) => {
+				if(e >= data_ini && e <= data_fim){
+					soma += dataTemperatura[timeTemperatura.indexOf(e)]
+					cont++;
+				}
+			})
+
+			media = soma / cont;
+			$("#mediaVal").text("Média:" + media.toFixed(2))
 
 			
 		})
@@ -153,6 +263,9 @@
 		$("#plotar").on('click', function(){
 
 			sendFile($("#select").children("option:selected").val())
+			$("#dados").removeClass('hidden')
+			$("#dadosVelocidade").removeClass('hidden')
+			$("#dadosTemperatura").removeClass('hidden')
 			
 		})
 		
@@ -174,15 +287,34 @@
 				data: {nome: nome},
 				success: function (response) {
 					var myChart = echarts.init(document.getElementById('main'));
+					var chartVelocidade = echarts.init(document.getElementById('chartVelocidade'));
+					var chartTemperatura = echarts.init(document.getElementById('chartTemperatura'));
 
 					time = []
 					data = []
-					response.pressao.map((e) => {
 
+					timeVelocidade = []
+					dataVelocidade = []
+
+					timeTemperatura = []
+					dataTemperatura = []
+
+
+					response.pressao.map((e) => {
 						time.push(e.data)
 						data.push(e.pressao)
-
 					})
+
+					response.velocidade.map((e) => {
+						timeVelocidade.push(e.data)
+						dataVelocidade.push(e.velocidade)
+					})
+
+					response.temperatura.map((e) => {
+						timeTemperatura.push(e.data)
+						dataTemperatura.push(e.temperatura)
+					})
+
 
 					$("#data_ini").select2({
 						data: time,
@@ -195,7 +327,27 @@
 
 					})
 					
-					
+					$("#data_ini_velocidade").select2({
+						data: timeVelocidade,
+						closeOnSelect: true
+					})
+
+					$("#data_fim_velocidade").select2({
+						data: timeVelocidade,
+						closeOnSelect: true
+
+					})
+
+					$("#data_ini_temperatura").select2({
+						data: timeTemperatura,
+						closeOnSelect: true
+
+					})
+					$("#data_fim_temperatura").select2({
+						data: timeTemperatura,
+						closeOnSelect: true
+
+					})
 					option = {
 						tooltip: {
 							trigger: 'axis',
@@ -267,20 +419,156 @@
 							}
 						]
 					};
+
+					optionVelocidade = {
+						tooltip: {
+							trigger: 'axis',
+							position: function (pt) {
+								return [pt[0], '10%'];
+							}
+						},
+						title: {
+							left: 'center',
+							text: 'Gráfico de Velocidade',
+						},
+						toolbox: {
+							feature: {
+								dataZoom: {
+									yAxisIndex: 'none'
+								},
+								restore: {},
+								saveAsImage: {}
+							}
+						},
+						xAxis: {
+							type: 'category',
+							boundaryGap: false,
+							data: timeVelocidade,
+							triggerEvent: true
+						},
+						yAxis: {
+							type: 'value',
+							boundaryGap: [0, '100%']
+							//triggerEvent: true
+						},
+						dataZoom: [{
+							type: 'inside',
+							start: 0,
+							end: 10
+						}, {
+							start: 0,
+							end: 10,
+							handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+							handleSize: '80%',
+							handleStyle: {
+								color: '#fff',
+								shadowBlur: 3,
+								shadowColor: 'rgba(0, 0, 0, 0.6)',
+								shadowOffsetX: 2,
+								shadowOffsetY: 2
+							}
+						}],
+						series: [
+							{
+								name:'Velocidade',
+								type:'line',
+								smooth:true,
+								symbol: 'none',
+								sampling: 'average',
+								itemStyle: {
+									color: 'rgb(255, 70, 131)'
+								},
+								areaStyle: {
+									color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+										offset: 0,
+										color: 'rgb(255, 158, 68)'
+									}, {
+										offset: 1,
+										color: 'rgb(255, 70, 131)'
+									}])
+								},
+								data: dataVelocidade
+							}
+						]
+					};
+
+					optionTemperatura = {
+						tooltip: {
+							trigger: 'axis',
+							position: function (pt) {
+								return [pt[0], '10%'];
+							}
+						},
+						title: {
+							left: 'center',
+							text: 'Gráfico de Temperatura',
+						},
+						toolbox: {
+							feature: {
+								dataZoom: {
+									yAxisIndex: 'none'
+								},
+								restore: {},
+								saveAsImage: {}
+							}
+						},
+						xAxis: {
+							type: 'category',
+							boundaryGap: false,
+							data: timeTemperatura,
+							triggerEvent: true
+						},
+						yAxis: {
+							type: 'value',
+							boundaryGap: [0, '100%']
+							//triggerEvent: true
+						},
+						dataZoom: [{
+							type: 'inside',
+							start: 0,
+							end: 10
+						}, {
+							start: 0,
+							end: 10,
+							handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+							handleSize: '80%',
+							handleStyle: {
+								color: '#fff',
+								shadowBlur: 3,
+								shadowColor: 'rgba(0, 0, 0, 0.6)',
+								shadowOffsetX: 2,
+								shadowOffsetY: 2
+							}
+						}],
+						series: [
+							{
+								name:'Temperatura',
+								type:'line',
+								smooth:true,
+								symbol: 'none',
+								sampling: 'average',
+								itemStyle: {
+									color: 'rgb(255, 70, 131)'
+								},
+								areaStyle: {
+									color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+										offset: 0,
+										color: 'rgb(255, 158, 68)'
+									}, {
+										offset: 1,
+										color: 'rgb(255, 70, 131)'
+									}])
+								},
+								data: dataTemperatura
+							}
+						]
+					};
+
 					myChart.setOption(option);
-					
-					myChart.on('click', function(params){
-						data1 = params.value
-						if(data1 == params.value){
-							params.event.target.style.textBackgroundColor = "red"
-						}
-						
-						alert(params.value)
-					})
-
+					chartVelocidade.setOption(optionVelocidade);
+					chartTemperatura.setOption(optionTemperatura);
 
 					
-
 				},
 				fail: function() {
 					alert("Servidor em baixo ou falha de rede");
