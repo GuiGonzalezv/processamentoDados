@@ -55,11 +55,30 @@
 							</div>
 
 							<div class="row">
+									<div class="col-md-4">
+										<label for="data_ini"> Data Inicial </label>
+										<select class="form-control" id="data_ini"></select>
+										
+									</div>
+
+									<div class="col-md-4">
+										<label for="data_fim"> Data Final</label>
+										<select class="form-control" id="data_fim"></select>										
+										
+									</div>
+									<div class="col-md-4"> 
+										<button class="btn btn-success btn-flat" id='media'>Média</button>
+									</div>
+							</div>
+
+							<div class="row">
 								<div class="col-md-3">
 									
 								</div>
 								<div class="col-md-5">
 									<div id="main" class="chart-container" style="width: 550px; height: 300px"></div>
+									<!-- <canvas id="myChart" width="700" height="400"></canvas> -->
+
 								</div>
 								<div class="col-md-4"></div>								
 							</div>
@@ -105,14 +124,44 @@
 	<%- include('footer'); -%>
 
 	<script>
+
+		$("#media").on('click', function(){
+			data_ini = $("#data_ini").val()
+			data_fim = $("#data_fim").val()
+
+			cont = 0
+			soma = 0
+
+			time.map((e) => {
+				if(e >= data_ini && e <= data_fim){
+					soma += data[time.indexOf(e)]
+					cont++;
+				}
+			})
+
+			media = soma / cont;
+			alert(media)
+
+			
+		})
+
 		$(document).ready(function () {
 			$('.sidebar-menu').tree()
 		})
 		
 
 		$("#plotar").on('click', function(){
+
 			sendFile($("#select").children("option:selected").val())
+			
 		})
+		
+		// $(".js-example-data-array").on('select2:close', function(e) {
+		// 	e.preventDefault()
+		// 	$(".js-example-data-array").select2("close");
+
+		// })
+
 		function sendFile(nome) {
 
 
@@ -135,7 +184,18 @@
 
 					})
 
+					$("#data_ini").select2({
+						data: time,
+						closeOnSelect: true
 
+					})
+					$("#data_fim").select2({
+						data: time,
+						closeOnSelect: true
+
+					})
+					
+					
 					option = {
 						tooltip: {
 							trigger: 'axis',
@@ -159,11 +219,13 @@
 						xAxis: {
 							type: 'category',
 							boundaryGap: false,
-							data: time
+							data: time,
+							triggerEvent: true
 						},
 						yAxis: {
 							type: 'value',
 							boundaryGap: [0, '100%']
+							//triggerEvent: true
 						},
 						dataZoom: [{
 							type: 'inside',
@@ -204,8 +266,20 @@
 								data: data
 							}
 						]
-						};
+					};
 					myChart.setOption(option);
+					
+					myChart.on('click', function(params){
+						data1 = params.value
+						if(data1 == params.value){
+							params.event.target.style.textBackgroundColor = "red"
+						}
+						
+						alert(params.value)
+					})
+
+
+					
 
 				},
 				fail: function() {
